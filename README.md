@@ -25,3 +25,6 @@ CREATE TABLE operaciones
 
 3. Ejecutar `importar.bat`.
 4. *(Opcional)* Ejecutar `reporte.bat`. Esto crea un archivo export.csv que puede ser usado con Excel para visualizar los datos de manera más cómoda.
+
+## checkCupones.py
+Toma los cupones diarios, en formato csv, y los compara con los liquidados para dar un reporte sobre aquellos que no hayan sido pagados todavía (que, posiblemente, entren en la liquidación del mes próximo).
