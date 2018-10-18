@@ -106,3 +106,6 @@ venv.bak/
 # Archivos específicos de tarjetas_v4
 *.pdf
 *.db
+*.csv
+*.docx
+*.xlsx
