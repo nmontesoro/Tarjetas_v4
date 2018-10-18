@@ -102,3 +102,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Archivos específicos de tarjetas_v4
+*.pdf
+*.db
