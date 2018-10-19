@@ -24,7 +24,7 @@ i = 0
 print('%-20s | %-10s | %-8s' % ('Sucursal', 'Tarjeta', 'Lote'))
 print('-' * 44)
 while (i < n):
-  print('%20s | %10s | %4i' % (cur[i][1], cur[i][2], cur[i][3]))
+  print('%20s | %10s | %8s' % (cur[i][1], cur[i][2], cur[i][3]))
   i += 1
 
 db.execute('DROP TABLE C_Cupones')
