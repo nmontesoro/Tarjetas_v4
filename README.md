@@ -2,12 +2,10 @@
 Parsea archivos PDF de liquidaciones mensuales de tarjetas Visa, Cabal y Maestro (débito únicamente)
 
 ## Librerías necesarias
-* sqlite3
-* time
-* glob
-* re
-* datetime
-* os
+* PyPDF2
+```shell
+pip install pypdf2
+```
 
 ## Uso básico
 ### Primer inicio
