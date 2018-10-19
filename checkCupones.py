@@ -16,7 +16,8 @@ with open('Cupones.csv', 'rt') as cf:
 sql_lotes_no_pagos = '''SELECT c.*, o.* FROM C_Cupones c
                         LEFT JOIN operaciones o
                         ON c.lote == o.lote AND c.local == o.sucursal AND c.tarjeta == o.tarjeta
-                        WHERE o.fpago IS NULL;'''
+                        WHERE o.fpago IS NULL
+                        ORDER BY c.local, c.tarjeta;'''
 cur = db.execute(sql_lotes_no_pagos).fetchall()
 
 n = len(cur) 
