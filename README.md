@@ -7,6 +7,7 @@ Parsea archivos PDF de liquidaciones mensuales de tarjetas Visa, Cabal y Maestro
 * glob
 * re
 * datetime
+* os
 
 ## Uso básico
 ### Primer inicio
