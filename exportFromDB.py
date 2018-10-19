@@ -1,5 +1,6 @@
 import sqlite3 as sql
 import time
+import os
 
 def getInput():
   result = []
@@ -45,3 +46,6 @@ with open(e_filename, 'wt') as fp:
   fp.close()
 
 print('\n\t%s bytes escritos >> %s' % (bytes_written, e_filename))
+
+if not bytes_written == 0:
+  os.system('start ' + e_filename)
