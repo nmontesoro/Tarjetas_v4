@@ -14,8 +14,15 @@ with open('Cupones.csv', 'rt') as cf:
     db.execute(sql_insert_str, (d, row['Local'].lower(), row['Tarjeta'].lower(), row['Lote'], money))
   cf.close()
 
-sql_lotes_no_pagos = '''SELECT c.*, o.* FROM C_Cupones c
-                        LEFT JOIN operaciones o
+sql_lotes_no_pagos = '''SELECT DATE(c.fecha, 'unixepoch') AS fecha, c.local,
+                          c.tarjeta, c.lote, c.importe AS bruto
+                        FROM C_Cupones c
+                        LEFT JOIN
+                        (
+                          SELECT sucursal, lote, fpago, tarjeta
+                          FROM operaciones
+                          GROUP BY sucursal, tarjeta, lote
+                        ) o
                         ON c.lote == o.lote AND c.local == o.sucursal AND c.tarjeta == o.tarjeta
                         WHERE o.fpago IS NULL
                         ORDER BY c.local, c.tarjeta;'''
