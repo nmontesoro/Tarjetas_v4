@@ -3,14 +3,15 @@ import sqlite3 as sql
 import datetime as dt
 
 db = sql.connect('data.db')
-db.execute('CREATE TABLE C_Cupones (fecha float, local char, tarjeta char, lote int)')
+db.execute('CREATE TABLE C_Cupones (fecha float, local char, tarjeta char, lote int, importe float)')
 
-sql_insert_str = 'INSERT INTO C_Cupones (fecha, local, tarjeta, lote) VALUES (?,?,?,?)'
+sql_insert_str = 'INSERT INTO C_Cupones (fecha, local, tarjeta, lote, importe) VALUES (?,?,?,?,?)'
 with open('Cupones.csv', 'rt') as cf:
   r = csv.DictReader(cf, delimiter=';')
   for row in r:
     d = dt.datetime.strptime(row['Fecha'], r'%d/%m/%Y').timestamp()
-    db.execute(sql_insert_str, (d, row['Local'].lower(), row['Tarjeta'].lower(), row['Lote']))
+    money = float(row['Importe'].replace('.', '').replace(',', '.'))
+    db.execute(sql_insert_str, (d, row['Local'].lower(), row['Tarjeta'].lower(), row['Lote'], money))
   cf.close()
 
 sql_lotes_no_pagos = '''SELECT c.*, o.* FROM C_Cupones c
@@ -30,3 +31,4 @@ while (i < n):
 
 db.execute('DROP TABLE C_Cupones')
 db.commit()
+db.close()
