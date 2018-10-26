@@ -15,6 +15,9 @@ CREATE TABLE operaciones
     (sucursal char, fpago float, liqno int, lote int,
     arancel float, impuestos float, importe float,
     adicionales float, tarjeta char);
+CREATE TABLE C_Cupones
+    (fecha float, local char, tarjeta char,
+    lote int, importe float);
 ```
 ### Mensualmente
 1. Borrar todos los PDF que hayan quedado de fechas anteriores.
