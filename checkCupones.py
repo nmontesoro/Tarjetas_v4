@@ -140,6 +140,8 @@ def printOpciones():
 if __name__ == '__main__':
   cp = cupones()
 
+  cp.importCupones()
+
   choice = 0
   while not (1 <= choice and choice <= 2):
     choice = printOpciones()
