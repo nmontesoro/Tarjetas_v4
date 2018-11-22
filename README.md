@@ -1,5 +1,5 @@
 # Tarjetas_v4
-Parsea archivos PDF de liquidaciones mensuales de tarjetas Visa, Cabal y Maestro (débito únicamente)
+Parsea archivos PDF de liquidaciones mensuales de tarjetas Visa, Cabal y Maestro (débito únicamente).
 
 ## Librerías necesarias
 * PyPDF2
@@ -15,6 +15,9 @@ CREATE TABLE operaciones
     (sucursal char, fpago float, liqno int, lote int,
     arancel float, impuestos float, importe float,
     adicionales float, tarjeta char);
+CREATE TABLE C_Cupones
+    (fecha float, local char, tarjeta char,
+    lote int, importe float);
 ```
 ### Mensualmente
 1. Borrar todos los PDF que hayan quedado de fechas anteriores.
@@ -27,4 +30,4 @@ CREATE TABLE operaciones
 5. *(Opcional)* Ejecutar `reporte.bat`. Esto crea un archivo export.csv que puede ser usado con Excel para visualizar los datos de manera más cómoda.
 
 ## checkCupones.py
-Toma los cupones diarios, en formato csv, y los compara con los liquidados para dar un reporte sobre aquellos que no hayan sido pagados todavía (que, posiblemente, entren en la liquidación del mes próximo).
+Toma los cupones diarios, en formato csv, y permite hacer un reporte sobre cupones liquidados y no liquidados (aquellos que entrarían en la liquidación del mes siguiente).
