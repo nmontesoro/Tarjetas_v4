@@ -122,6 +122,7 @@ class pdfParser():
     re_liqno = regex.compile(r'(\d{6})\d{2}/\d{2}/\d{4}')
     # La regex esta bien. Hecha asi por el formato de raw_text
     re_fpago = regex.compile(r'F\. Pres(\d{2}/\d{2}/\d{4})')
+    re_percepciones = regex.compile(r'PER.*?-\$([\d\.]*,\d{2})')
     for fila in filas:
       fpago = dt.datetime.strptime(re_fpago.findall(fila)[0], '%d/%m/%Y').timestamp()
       arancel = self._convertMoneyToFloat(re_arancel.findall(fila)[0])
@@ -136,6 +137,9 @@ class pdfParser():
       for ret in re_retenciones.findall(fila):
         retenciones += self._convertMoneyToFloat(ret)
       
+      for per in re_percepciones.findall(fila):
+        impuestos += self._convertMoneyToFloat(per)
+
       ops = re_ops.findall(fila)
       n = len(ops)
       i = 0
@@ -175,9 +179,15 @@ class pdfParser():
     return liqs
 
 if __name__ == '__main__':
-  p = pdfParser('MAESTRO-.pdf')
+  p = pdfParser('2018-10-maestro-libertad.pdf')
   liqs = p.getLiquidaciones()
   
+  imp = 0
+  for liq in liqs:
+    if liq['liqno'] == 348638:
+      imp += liq['impuestos']
+  print(imp)
+
   print('hola')
   for liq in liqs:
     for key, value in liq.items():
