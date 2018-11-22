@@ -181,14 +181,7 @@ class pdfParser():
 if __name__ == '__main__':
   p = pdfParser('2018-10-maestro-libertad.pdf')
   liqs = p.getLiquidaciones()
-  
-  imp = 0
-  for liq in liqs:
-    if liq['liqno'] == 348638:
-      imp += liq['impuestos']
-  print(imp)
 
-  print('hola')
   for liq in liqs:
     for key, value in liq.items():
       print(key + ': ' + str(value))
