@@ -1,5 +1,6 @@
 import csv
 import sqlite3 as sql
+from datetime import datetime
 
 
 class cupones():
@@ -19,7 +20,10 @@ class cupones():
         return csv_content
 
     def _ParseCSV(self, cur):
-        return self._CursorToCSV(cur, sep=',', old=',', new=' ')
+        fecha = 'Generado el ' + datetime.now().strftime(r'%Y-%m-%d')
+        csv_content = self._CursorToCSV(cur, sep=';', old='.', new=',')
+        csv_content = fecha + '\n' + csv_content
+        return csv_content
 
     def GetCuponesPagados(self):
         sql_pagados = '''SELECT * FROM export
