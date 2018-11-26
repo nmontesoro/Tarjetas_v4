@@ -27,7 +27,7 @@ def parseLine(line, sep=',', old='', new=''):
 
             if field_type == 'd':
                 fields[i] = float(time.mktime(time.strptime(fields[i],
-                                                            '%d/%m/%Y'))) - time.timezone
+                                                '%d/%m/%Y'))) - time.timezone
             elif field_type == 'i':
                 fields[i] = int(fields[i])
             elif field_type == 'f':
