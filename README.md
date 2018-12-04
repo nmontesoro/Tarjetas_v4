@@ -20,23 +20,34 @@ CREATE TABLE operaciones
     impuestos float, importe float, adicionales float, tarjeta char);
 
 CREATE VIEW cupones_agrupados AS
-SELECT sucursal, tarjeta, lote, SUM(importe) AS importe
+SELECT
+    cast(strftime('%m', date(fecha, 'unixepoch')) as int) AS mes,
+    cast(strftime('%Y', date(fecha, 'unixepoch')) as int) AS ano,
+    sucursal, tarjeta, lote, SUM(importe) AS importe
 FROM cupones
-GROUP BY sucursal, tarjeta, lote;
+GROUP BY mes, ano, sucursal, tarjeta, lote;
 
 CREATE VIEW lotes_agrupados AS
-SELECT sucursal, tarjeta, lote, GROUP_CONCAT(DISTINCT liqno) AS liquidaciones,
-    SUM(importe) AS importe,
-    SUM(arancel + impuestos + adicionales) AS gastos
+SELECT
+    CAST(STRFTIME('%m', DATE(fpago, 'unixepoch')) AS int) AS mes,
+    CAST(STRFTIME('%Y', DATE(fpago, 'unixepoch')) AS int) AS ano,
+    sucursal, tarjeta, lote, GROUP_CONCAT(DISTINCT liqno) AS liquidaciones,
+    SUM(importe) AS importe, SUM(arancel + impuestos + adicionales) AS gastos
 FROM operaciones
-GROUP BY sucursal, tarjeta, lote;
+GROUP BY mes, ano, sucursal, tarjeta, lote;
 
 CREATE VIEW export AS
-SELECT c.sucursal, c.tarjeta, c.lote, l.liquidaciones, c.importe AS presentado,
-    l.importe AS liquidado, (l.importe - c.importe) AS diferencia, l.gastos
+SELECT
+    c.mes, c.ano, c.sucursal, c.tarjeta, c.lote, l.liquidaciones,
+    ROUND(c.importe, 2) AS presentado, ROUND(l.importe, 2) AS liquidado,
+    ROUND((l.importe - c.importe), 2) AS diferencia,
+    ROUND(l.gastos, 2) AS gastos
 FROM cupones_agrupados c
 LEFT JOIN lotes_agrupados l
-ON c.sucursal == l.sucursal
+ON
+    c.mes == l.mes
+    AND c.ano == l.ano
+    AND c.sucursal == l.sucursal
     AND c.tarjeta == l.tarjeta
     AND c.lote == l.lote;
 ```

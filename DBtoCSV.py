@@ -39,39 +39,45 @@ class cupones():
         csv_content += self._CursorToCSV(cur, sep=';', old='.', new=',')
         return csv_content
 
-    def GetCuponesPagados(self):
+    def GetCuponesPagados(self, month, year):
         sql_pagados = '''SELECT * FROM export
                          WHERE liquidado IS NOT NULL
-                         AND ABS(diferencia) < 0.5'''
+                         AND ABS(diferencia) < 0.5
+                         AND mes == %s
+                         AND ano == %s''' % (month, year)
 
         cur = self.db.execute(sql_pagados).fetchall()
 
         return self._ParseCSV(cur, 'export')
 
-    def GetCuponesNoPagados(self):
+    def GetCuponesNoPagados(self, month, year):
         sql_no_pagados = '''SELECT * FROM export
-                            WHERE liquidado IS NULL'''
+                            WHERE liquidado IS NULL
+                            AND mes == %s
+                            AND ano == %s''' % (month, year)
 
         cur = self.db.execute(sql_no_pagados).fetchall()
 
         return self._ParseCSV(cur, 'export')
 
-    def GetCuponesProblematicos(self):
+    def GetCuponesProblematicos(self, month, year):
         # Cupones pagados parcialmente, o errores de carga
 
         sql_problematicos = '''SELECT * FROM export
                                WHERE liquidado IS NOT NULL
-                               AND ABS(diferencia) >= 0.5'''
+                               AND ABS(diferencia) >= 0.5
+                               AND mes == %s
+                               AND ano == %s''' % (month, year)
 
         cur = self.db.execute(sql_problematicos).fetchall()
 
         return self._ParseCSV(cur, 'export')
 
-    def ExportCupones(self):
+    def ExportCupones(self, month, year):
         steps = {
-            'pagados.csv': self.GetCuponesPagados(),
-            'nopagados.csv': self.GetCuponesNoPagados(),
-            'problematicos.csv': self.GetCuponesProblematicos()
+            'pagados.csv': self.GetCuponesPagados(month, year),
+            'nopagados.csv': self.GetCuponesNoPagados(month, year),
+            'problematicos.csv': self.GetCuponesProblematicos(month, year)
         }
 
         for filename, content in steps.items():
@@ -81,5 +87,7 @@ class cupones():
 
 
 if __name__ == '__main__':
+    month = int(input('Mes? (1-12): '))
+    year = int(input('Año? (2018-): '))
     c = cupones()
-    c.ExportCupones()
+    c.ExportCupones(month, year)
