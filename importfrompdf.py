@@ -8,9 +8,9 @@ for file in glob.glob('pdf/*.pdf'):
     p = pdfParser(file)
     liqs = p.getLiquidaciones()
 
-    sql_insert_str = 'INSERT INTO operaciones (sucursal, fpago, liqno, lote, '
-    + 'arancel, impuestos, importe, adicionales, tarjeta)'
-    + ' VALUES (?,?,?,?,?,?,?,?,?)'
+    sql_insert_str = ('INSERT INTO operaciones (sucursal, fpago, liqno, lote, '
+        + 'arancel, impuestos, importe, adicionales, tarjeta)'
+        + ' VALUES (?,?,?,?,?,?,?,?,?)')
     suc = p.sucursal
     tar = p.tarjeta
     for liq in liqs:
