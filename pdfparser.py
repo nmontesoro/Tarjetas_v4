@@ -74,9 +74,18 @@ class pdfParser():
         for fila in filas:
             fpago = dt.datetime.strptime(re_fpago.findall(
                 fila)[0] + '/' + str(ano), '%d/%m/%Y').timestamp()
-            arancel = self._convertMoneyToFloat(re_arancel.findall(fila)[0])
-            impuestos = self._convertMoneyToFloat(
-                re_impuestos.findall(fila)[0])
+
+            try:
+                arancel = self._convertMoneyToFloat(
+                    re_arancel.findall(fila)[0])
+            except:
+                arancel = 0.0
+
+            try:
+                impuestos = self._convertMoneyToFloat(
+                    re_impuestos.findall(fila)[0])
+            except:
+                impuestos = 0.0
 
             try:
                 lapos = self._convertMoneyToFloat(re_lapos.findall(fila)[0])
@@ -141,9 +150,22 @@ class pdfParser():
         for fila in filas:
             fpago = dt.datetime.strptime(re_fpago.findall(fila)[
                                          0], '%d/%m/%Y').timestamp()
-            arancel = self._convertMoneyToFloat(re_arancel.findall(fila)[0])
-            impuestos = self._convertMoneyToFloat(re_iva.findall(fila)[0])
-            liqno = int(re_liqno.findall(fila)[0])
+
+            try:
+                arancel = self._convertMoneyToFloat(
+                    re_arancel.findall(fila)[0])
+            except:
+                arancel = 0.0
+
+            try:
+                impuestos = self._convertMoneyToFloat(re_iva.findall(fila)[0])
+            except:
+                impuestos = 0.0
+
+            try:
+                liqno = int(re_liqno.findall(fila)[0])
+            except:
+                liqno = 0
 
             op_intl = 0.0
             for intlop in re_ops_intl.findall(fila):
