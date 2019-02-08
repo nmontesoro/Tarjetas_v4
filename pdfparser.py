@@ -30,9 +30,10 @@ class pdfParser():
         self._getDatosLiquidacion(filename)
 
     def _getDatosLiquidacion(self, filename):
+        filename = filename.lower()
         datos = regex.findall(r'\d{4}-\d{2}-(\w+)-([\w ]*)\.pdf', filename)
-        self.tarjeta = datos[0][0].lower()
-        self.sucursal = datos[0][1].lower()
+        self.tarjeta = datos[0][0]
+        self.sucursal = datos[0][1]
 
     def _extractText(self):
         raw_text = ''
