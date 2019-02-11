@@ -1,12 +1,12 @@
-from pdfparser import pdfParser
+from pdfparser import PdfParser
 import glob
 import sqlite3 as sql
 
 db = sql.connect('data.db')
 for file in glob.glob('pdf/*.pdf'):
     print('Procesando %s' % (file))
-    p = pdfParser(file)
-    liqs = p.getLiquidaciones()
+    p = PdfParser(file)
+    liqs = p.get_liquidaciones()
 
     sql_insert_str = ('INSERT INTO operaciones (sucursal, fpago, liqno, lote, '
         + 'arancel, impuestos, importe, adicionales, tarjeta)'

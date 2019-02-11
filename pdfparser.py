@@ -13,14 +13,13 @@ import PyPDF2
 # \d{1,} Ventas? (?:(?:en\s*\d{1,} pagos?)|(?:Tj. ?D.bito))\$[\d\. ]*,\d{2})
 
 
-class pdfParser():
-    fp = None
-    pdf = None
+class PdfParser():
+    file_obj = None
+    pdf_obj = None
     tarjeta = ''
     sucursal = ''
 
-    # Prototipo
-    op = {
+    prototype = {
         'fpago': 0.0,
         'liqno': 0,
         'lote': 0,
@@ -31,29 +30,29 @@ class pdfParser():
     }
 
     def __init__(self, filename):
-        self.fp = open(filename, 'rb')
-        self.pdf = PyPDF2.PdfFileReader(self.fp)
-        self._getDatosLiquidacion(filename)
+        self.file_obj = open(filename, 'rb')
+        self.pdf_obj = PyPDF2.PdfFileReader(self.file_obj)
+        self._get_datos_liquidacion(filename)
 
-    def _getDatosLiquidacion(self, filename):
+    def _get_datos_liquidacion(self, filename):
         filename = filename.lower()
         datos = regex.findall(r'\d{4}-\d{2}-(\w+)-([\w ]*)\.pdf', filename)
         self.tarjeta = datos[0][0]
         self.sucursal = datos[0][1]
 
-    def _extractText(self):
+    def _extract_text(self):
         raw_text = ''
-        n = self.pdf.numPages
+        n = self.pdf_obj.numPages
         i = 0
         while (i < n):
-            raw_text += self.pdf.getPage(i).extractText()
+            raw_text += self.pdf_obj.getPage(i).extractText()
             i += 1
         return raw_text
 
-    def _parseVisa(self):
+    def _parse_visa(self):
         liqs = []
 
-        raw_text = self._extractText()
+        raw_text = self._extract_text()
 
         filas = regex.findall(
             r'FECHA DE PAGO[\s\S]*?Total del d.a (?:\$[\d\. ]*,\d{2}){3}',
@@ -82,30 +81,30 @@ class pdfParser():
                 fila)[0] + '/' + str(ano), '%d/%m/%Y').timestamp()
 
             try:
-                arancel = self._convertMoneyToFloat(
+                arancel = self._money_to_float(
                     re_arancel.findall(fila)[0])
             except:
                 arancel = 0.0
 
             try:
-                impuestos = self._convertMoneyToFloat(
+                impuestos = self._money_to_float(
                     re_impuestos.findall(fila)[0])
             except:
                 impuestos = 0.0
 
             try:
-                lapos = self._convertMoneyToFloat(re_lapos.findall(fila)[0])
+                lapos = self._money_to_float(re_lapos.findall(fila)[0])
             except:
                 lapos = 0.0
 
             try:
-                financieros = self._convertMoneyToFloat(
+                financieros = self._money_to_float(
                     re_financieros.findall(fila)[0])
             except:
                 financieros = 0.0
 
             try:
-                adicionales = self._convertMoneyToFloat(
+                adicionales = self._money_to_float(
                     re_adicionales.findall(fila)[0])
             except:
                 adicionales = 0.0
@@ -116,26 +115,26 @@ class pdfParser():
             n = len(lotes)
             i = 0
             while (i < n):
-                self.op['fpago'] = fpago
-                self.op['liqno'] = int(liqnos[i])
-                self.op['lote'] = int(lotes[i])
-                self.op['importe'] = self._convertMoneyToFloat(importes[i])
-                self.op['arancel'] = arancel / n
-                self.op['impuestos'] = impuestos / n
-                self.op['adicionales'] = (
+                self.prototype['fpago'] = fpago
+                self.prototype['liqno'] = int(liqnos[i])
+                self.prototype['lote'] = int(lotes[i])
+                self.prototype['importe'] = self._money_to_float(importes[i])
+                self.prototype['arancel'] = arancel / n
+                self.prototype['impuestos'] = impuestos / n
+                self.prototype['adicionales'] = (
                     lapos + financieros + adicionales) / n
-                liqs.append(self.op.copy())
+                liqs.append(self.prototype.copy())
                 i += 1
 
         return liqs
 
-    def _convertMoneyToFloat(self, money):
+    def _money_to_float(self, money):
         return float(money.replace('.', '').replace(',', '.'))
 
-    def _parseMaestro(self):
+    def _parse_maestro(self):
         liqs = []
 
-        raw_text = self._extractText()
+        raw_text = self._extract_text()
 
         filas = regex.findall(
             r'Venta ctdo.*?F. Pres\d{2}/\d{2}/\d{4}', raw_text)
@@ -158,13 +157,13 @@ class pdfParser():
                                          0], '%d/%m/%Y').timestamp()
 
             try:
-                arancel = self._convertMoneyToFloat(
+                arancel = self._money_to_float(
                     re_arancel.findall(fila)[0])
             except:
                 arancel = 0.0
 
             try:
-                impuestos = self._convertMoneyToFloat(re_iva.findall(fila)[0])
+                impuestos = self._money_to_float(re_iva.findall(fila)[0])
             except:
                 impuestos = 0.0
 
@@ -175,27 +174,27 @@ class pdfParser():
 
             op_intl = 0.0
             for intlop in re_ops_intl.findall(fila):
-                op_intl += self._convertMoneyToFloat(intlop)
+                op_intl += self._money_to_float(intlop)
 
             retenciones = 0.0
             for ret in re_retenciones.findall(fila):
-                retenciones += self._convertMoneyToFloat(ret)
+                retenciones += self._money_to_float(ret)
 
             for per in re_percepciones.findall(fila):
-                impuestos += self._convertMoneyToFloat(per)
+                impuestos += self._money_to_float(per)
 
             ops = re_ops.findall(fila)
             n = len(ops)
             i = 0
             while (i < n):
-                self.op['fpago'] = fpago
-                self.op['liqno'] = liqno
-                self.op['lote'] = int(ops[i][0])
-                self.op['importe'] = self._convertMoneyToFloat(ops[i][1])
-                self.op['arancel'] = arancel / n
-                self.op['impuestos'] = (impuestos + retenciones) / n
-                self.op['adicionales'] = (op_intl) / n
-                liqs.append(self.op.copy())
+                self.prototype['fpago'] = fpago
+                self.prototype['liqno'] = liqno
+                self.prototype['lote'] = int(ops[i][0])
+                self.prototype['importe'] = self._money_to_float(ops[i][1])
+                self.prototype['arancel'] = arancel / n
+                self.prototype['impuestos'] = (impuestos + retenciones) / n
+                self.prototype['adicionales'] = (op_intl) / n
+                liqs.append(self.prototype.copy())
                 i += 1
 
         return liqs
@@ -209,13 +208,13 @@ class pdfParser():
 
     #   for fila in filas:
 
-    def getLiquidaciones(self):
+    def get_liquidaciones(self):
         liqs = []
 
         if (self.tarjeta == 'visa' or self.tarjeta == 'cabal'):
-            liqs = self._parseVisa()
+            liqs = self._parse_visa()
         elif (self.tarjeta == 'maestro'):
-            liqs = self._parseMaestro()
+            liqs = self._parse_maestro()
         else:
             print('No implementado...')
 
@@ -223,8 +222,8 @@ class pdfParser():
 
 
 if __name__ == '__main__':
-    p = pdfParser('2018-10-maestro-libertad.pdf')
-    liqs = p.getLiquidaciones()
+    p = PdfParser('2018-10-maestro-libertad.pdf')
+    liqs = p.get_liquidaciones()
 
     for liq in liqs:
         for key, value in liq.items():
