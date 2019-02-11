@@ -1,6 +1,12 @@
-import PyPDF2
+"""
+pdfparser: Toma un archivo pdf y lo procesa en busca de liquidaciones de
+tarjetas de débito
+"""
+
+
 import re as regex
 import datetime as dt
+import PyPDF2
 
 # regex plata: [\d\.]*,\d{2}
 # Liq\. N. (\d{8}) - Lote N. [\n]?\d{4}\s*(\d{1,}) Ventas? Tj. ?D.bito\$([\d\. ]*,\d{2})
